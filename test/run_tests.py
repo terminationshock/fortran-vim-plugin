@@ -17,6 +17,8 @@ with open(tmp.name, 'w') as fd:
             if "import vim" in line:
                 fd.write("from importlib import reload\n")
                 fd.write("reload(vim)\n")
+            if "debug =" in line:
+                fd.write("debug = True")
     fd.write("\nrun()")
 
 template = """
@@ -66,12 +68,13 @@ for test in tests:
     s = f.getvalue()
     if "Test failed" in s:
         ok = False
-        print(s.strip())
+    print(s.strip())
 
     os.unlink("vim.py")
     with os.scandir("__pycache__") as fs:
         for f in fs:
             os.unlink(f)
-
-if not ok:
+if ok:
+    print("All tests succeeded")
+else:
     raise Exception("At least one test failed")
