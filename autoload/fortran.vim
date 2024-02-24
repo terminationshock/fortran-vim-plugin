@@ -34,15 +34,14 @@ def print_debug(mark, element):
         print("   {}: <{}> '{}' :{}".format(mark, element.tag, element.text, element.sourceline))
 
 def load_tree(filename):
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".f90")
-    tmp_f90 = tmp.name
-    tmp_xml = tmp.name + ".xml"
+    tmp_f90 = tempfile.NamedTemporaryFile(delete=False, suffix=".f90")
+    tmp_xml = tempfile.NamedTemporaryFile(delete=False, suffix=".xml")
 
-    redirect = "/dev/null"
+    redirect = " &> /dev/null"
     if debug:
-        redirect = tmp.name + ".out"
-        print(tmp_f90)
-        print(redirect)
+        redirect = ""
+        print(tmp_f90.name)
+        print(tmp_xml.name)
 
     bindir = os.path.dirname(vim.eval("s:basedir")) + "/fortran"
     if use_fypp:
@@ -50,35 +49,34 @@ def load_tree(filename):
         for file in fypp_files:
             incdirs.add(os.path.dirname(file))
         incdirs = " ".join(["--include={}".format(incdir) for incdir in incdirs])
-        os.system("{}/fypp/fypp {} {} {} &> {}".format(bindir, incdirs, filename, tmp_f90, redirect))
+        os.system("{}/fypp/fypp {} {} {} {}".format(bindir, incdirs, filename, tmp_f90.name, redirect))
     else:
-        os.system("cp {} {}", filename, tmp_f90)
-    filesize = os.stat(tmp_f90).st_size
+        os.system("cp {} {}", filename, tmp_f90.name)
+    filesize = os.stat(tmp_f90.name).st_size
     if filesize == 0:
         if debug:
-            raise Exception("fypp error: {}".format(open(redirect).read()))
+            raise Exception("fypp error")
         return None, None
 
-    os.system("LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{}/fxtran {}/fxtran/fxtran -construct-tag -no-include -uppercase {} &> {}".format(bindir, bindir, tmp_f90, redirect))
-    if not os.path.isfile(tmp_xml):
+    os.system("LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{}/fxtran {}/fxtran/fxtran -construct-tag -no-include -uppercase -o {} {} {}".format(bindir, bindir, tmp_xml.name, tmp_f90.name, redirect))
+    if not os.path.isfile(tmp_xml.name):
         if debug:
-            raise Exception("fxtran error: {}".format(open(redirect).read()))
-        return None, tmp_f90
+            raise Exception("fxtran error")
+        return None, tmp_f90.name
 
-    tree = etree.parse(tmp_xml)
-    if debug:
-        print(tmp_xml)
-    else:
-        os.unlink(tmp_xml)
+    tree = etree.parse(tmp_xml.name)
+    if not debug:
+        os.unlink(tmp_xml.name)
 
     for element in tree.findall('.//*'):
         if '}' in element.tag:
             element.tag = element.tag.split('}')[-1]
 
+    filename_f90 = tmp_f90.name
     if filesize == os.stat(filename).st_size:
-        os.unlink(tmp_f90)
-        tmp_f90 = filename
-    return tree, tmp_f90
+        os.unlink(tmp_f90.name)
+        filename_f90 = filename
+    return tree, filename_f90
 
 def find_module_file(mod):
     regex_mod = re.compile(r"^[ \t]*module[ \t]+", re.IGNORECASE)
