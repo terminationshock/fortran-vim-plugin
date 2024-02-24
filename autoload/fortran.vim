@@ -56,15 +56,13 @@ def load_tree(filename):
     filesize = os.stat(tmp_f90).st_size
     if filesize == 0:
         if debug:
-            os.system("cat {}".format(redirect))
-            raise Exception("fypp error")
+            raise Exception("fypp error: {}".format(open(redirect).read()))
         return None, None
 
     os.system("LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{}/fxtran {}/fxtran/fxtran -construct-tag -no-include -uppercase {} &> {}".format(bindir, bindir, tmp_f90, redirect))
     if not os.path.isfile(tmp_xml):
         if debug:
-            os.system("cat {}".format(redirect))
-            raise Exception("fxtran error")
+            raise Exception("fxtran error: {}".format(open(redirect).read()))
         return None, tmp_f90
 
     tree = etree.parse(tmp_xml)
