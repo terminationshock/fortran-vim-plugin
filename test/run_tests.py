@@ -68,9 +68,9 @@ for test in tests:
             exec(open(tmp.name).read())
     finally:
         s = f.getvalue()
+        print(s.strip())
     if "Test failed" in s:
         ok = False
-    print(s.strip())
 
     os.unlink("vim.py")
     with os.scandir("__pycache__") as fs:
