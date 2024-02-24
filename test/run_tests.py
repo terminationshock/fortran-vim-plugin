@@ -18,7 +18,7 @@ with open(tmp.name, 'w') as fd:
                 fd.write("from importlib import reload\n")
                 fd.write("reload(vim)\n")
             if "debug =" in line:
-                fd.write("debug = True")
+                fd.write("debug = True\n")
     fd.write("\nrun()")
 
 template = """
@@ -63,9 +63,11 @@ for test in tests:
         fd.write(template.format(*((path + "/../autoload/fortran.vim",) + test + test)))
 
     f = StringIO()
-    with redirect_stdout(f):
-        exec(open(tmp.name).read())
-    s = f.getvalue()
+    try:
+        with redirect_stdout(f):
+            exec(open(tmp.name).read())
+    finally:
+        s = f.getvalue()
     if "Test failed" in s:
         ok = False
     print(s.strip())
