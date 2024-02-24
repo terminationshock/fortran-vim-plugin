@@ -27,3 +27,7 @@ By default, the plugin is bound to the key `F4`. Press it to navigate to the mat
 ## Update
 
 To fetch the latest version of this plugin, run `:PlugUpdate`.
+
+## Tests
+
+Tests have been implemented for this plugin. Go to the `test` directory and run `./run_tests.py`.

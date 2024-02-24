@@ -5,6 +5,7 @@ module mod_test3
     type(type_b) :: b
     contains
       procedure :: subc
+      procedure :: subc3 => sub3
   end type
 
 contains
