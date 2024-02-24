@@ -21,7 +21,13 @@ try:
             elif file.abspath.endswith(".fypp"):
                 fypp_files.append(file.abspath)
 except git.InvalidGitRepositoryError:
-    pass
+    for _, _, files in os.walk(os.getcwd()):
+        for file in files:
+            if os.path.isfile(file.abspath):
+                if file.abspath.endswith((".f", ".F", ".f90", ".F90")):
+                    f90_files.append(file.abspath)
+                elif file.abspath.endswith(".fypp"):
+                    fypp_files.append(file.abspath)
 
 def print_debug(mark, element):
     if debug:
