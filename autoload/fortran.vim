@@ -38,7 +38,7 @@ def load_tree(filename):
         print(tmp_f90)
         print(redirect)
 
-    bindir = "~/.vim/autoload/fortran"
+    bindir = os.path.dirname(vim.eval("s:basedir")) + "/fortran"
     if use_fypp:
         incdirs = set()
         for file in fypp_files:
@@ -291,12 +291,12 @@ def find(filename, line_number, pattern):
     return None
 
 def run():
-    filename = vim.eval("filename")
+    filename = vim.eval("l:filename")
     if not filename.endswith((".f", ".F", ".f90", ".F90")):
         print("Not a Fortran file")
         return
 
-    pattern = vim.eval("pattern").strip()
+    pattern = vim.eval("l:pattern").strip()
 
     if len(pattern) == 0:
         pattern = vim.eval("@/")
@@ -330,8 +330,9 @@ def run():
     print("{} not found".format(pattern))
 EOF
 
+let s:basedir = resolve(expand('<sfile>:p'))
 function! fortran#Fortran()
-    let filename = resolve(expand('%:p'))
-    let pattern = expand('<cword>')
+    let l:filename = resolve(expand('%:p'))
+    let l:pattern = expand('<cword>')
     python3 run()
 endfunction
