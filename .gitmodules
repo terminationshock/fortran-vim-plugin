@@ -1,0 +1,6 @@
+[submodule "fxtran"]
+	path = fxtran
+	url = https://github.com/pmarguinaud/fxtran.git
+[submodule "fypp"]
+	path = fypp
+	url = https://github.com/aradi/fypp

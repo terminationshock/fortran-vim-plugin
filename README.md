@@ -6,6 +6,8 @@ This repository provides a Vim plugin for Fortran developers. In its current ver
 of a variable, subroutine, function, etc. in a complex software project. All related files must either be part of a Git repository or
 inside the current working directory.
 
+This plugin calls [fxtran](https://github.com/pmarguinaud/fxtran) and [Fypp](https://github.com/aradi/fypp) under the hood.
+
 ## Installation
 
 1. Install `vim-plug` if you do not have it yet. See installation instructions [here](https://github.com/junegunn/vim-plug?tab=readme-ov-file#installation).
