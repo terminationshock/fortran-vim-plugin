@@ -33,6 +33,12 @@ def print_debug(mark, element):
     if debug:
         print("   {}: <{}> '{}' :{}".format(mark, element.tag, element.text, element.sourceline))
 
+def show_location_list(items):
+    vim.command(":set efm=%f:%l")
+    vim.command(":cexpr [{}]".format(",".join(["'{}'".format(item) for item in items])))
+    vim.command(":copen")
+    vim.command(":call setqflist([], 'a', {'title' : ''})")
+
 def load_tree(filename):
     tmp_f90 = tempfile.NamedTemporaryFile(delete=False, suffix=".f90")
     tmp_xml = tempfile.NamedTemporaryFile(delete=False, suffix=".xml")
@@ -259,11 +265,21 @@ def find_line_in_file(line, filename):
                 line_number = n + 1
     return line_number
 
-def find(filename, line_number, pattern):
+def extract_file_line(result):
+    tmp_file, orig_file, line = result
+
+    if tmp_file != orig_file:
+        with open(tmp_file, 'r') as fd:
+            line = find_line_in_file(fd.readlines()[line-1], orig_file)
+
+    return orig_file, line
+
+def find(filename, line_number, pattern, showSteps=True):
     orig_filename = filename
     tree, filename = load_tree(filename)
     if tree is None:
-        return None
+        print("Cannot parse this Fortran file")
+        return
 
     if filename != orig_filename:
         line_number = find_line_in_file(vim.current.line, filename)
@@ -273,26 +289,27 @@ def find(filename, line_number, pattern):
         if element.sourceline == line_number:
             break
     if element is None:
-        return None
+        print("Selected element not found")
+        return
 
-    result = find_declaration(filename, orig_filename, element, [pattern], ["variable_declaration_type_callable"])
+    result = find_declaration(filename, orig_filename, element, [pattern.upper()], ["variable_declaration_type_callable"])
     if len(result) == 0:
-        return None
-    file, orig_file, line = result[-1]
+        print("{} not found".format(pattern))
+        return
 
-    if file != orig_file:
-        with open(file, 'r') as fd:
-            line = find_line_in_file(fd.readlines()[line-1], orig_file)
+    file, line = extract_file_line(result[-1])
 
     if file == orig_filename:
         if line is not None:
-            return ":{}".format(line)
+            vim.command(":{}".format(line))
     else:
         if line is not None:
-            return ":edit +{} {}".format(line, orig_file)
+            vim.command(":edit +{} {}".format(line, file))
         else:
-            return ":edit {}".format(orig_file)
-    return None
+            vim.command(":edit {}".format(file))
+
+    if showSteps:
+        show_location_list(["{}:{}".format(*extract_file_line(r)) for r in result[::-1]])
 
 def run():
     filename = vim.eval("l:filename")
@@ -313,25 +330,12 @@ def run():
         print("Empty search query")
         return
 
-    vim.command(":mark Z")
-
     try:
-        command = find(filename, int(vim.eval("line('.')")), pattern.upper())
+        find(filename, int(vim.eval("line('.')")), pattern)
     except Exception as e:
         print("Error in Fortran plugin: " + str(e))
         if debug:
             raise e
-        return
-    if command is not None:
-        try:
-            vim.command(command)
-        except vim.error as e:
-            print("Error in Fortran plugin: " + str(e))
-            return
-        print("Go back with `Z")
-        return
-
-    print("{} not found".format(pattern))
 EOF
 
 let s:basedir = resolve(expand('<sfile>:p'))
