@@ -32,7 +32,7 @@ def eval(c):
     elif c == "l:pattern":
         return "{}"
 def command(c):
-    if c == ":mark Z":
+    if c.startswith((":set efm", ":cexpr", ":copen", ":call setqflist")):
         pass
     elif c != "{}":
         raise Exception("Test failed: {}:{} {} {} " + c)
