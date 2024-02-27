@@ -21,9 +21,11 @@ call plug#end()
 
 4. Install further Python packages with `pip install GitPython fortls`.
 
+5. Run `fortls -v` to verify that the language server is ready.
+
 ## Usage
 
-Open any Fortran file and move the cursor onto an entity name (for example, a variable).
+Open any Fortran file and move the cursor onto an entity name (for example, a variable or a subroutine).
 Press `F3` to navigate to its declaration. Press `F4` to see all references.
 
 ## Update
