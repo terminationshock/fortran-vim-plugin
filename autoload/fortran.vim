@@ -37,6 +37,8 @@ def send_request(path, method, filename, row, col):
         raise Exception("Invalid response from fortls")
 
     result = json.loads(lastline)["result"]
+    if result is None:
+        return None
     if isinstance(result, list):
         return result
     return [result]
@@ -75,6 +77,8 @@ def evaluate_response(filename, responses):
 
 
 def run(method):
+    vim.command(":echon 'Please wait...'")
+    vim.command(":redraw")
     filename = vim.eval("l:filename")
     row = int(vim.eval("line('.')")) - 1
     col = int(vim.eval("col('.')")) - 1
@@ -88,9 +92,12 @@ def run(method):
     try:
         response = send_request(path, method, filename, row, col)
         if response is not None:
+            vim.command(":echon ''")
             evaluate_response(filename, response)
+        else:
+            vim.command(":echon 'No result'")
     except Exception as e:
-        print("Error in Fortran plugin. {}".format(e))
+        vim.command(":echon 'Error in Fortran plugin. {}'".format(e))
 EOF
 
 function! fortran#FindDefinition()
