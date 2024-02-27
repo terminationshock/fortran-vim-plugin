@@ -3,4 +3,5 @@ if exists("g:loaded_fortran_plugin")
 endif
 let g:loaded_fortran_plugin = 1
 
-nmap <F4> :call fortran#Fortran()<CR>
+nmap <F3> :call fortran#FindDefinition()<CR>
+nmap <F4> :call fortran#FindReferences()<CR>

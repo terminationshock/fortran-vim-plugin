@@ -3,10 +3,10 @@
 # Fortran Vim Plugin
 
 This repository provides a Vim plugin for Fortran developers. In its current version, it can be used to jump to the declaration
-of a variable, subroutine, function, etc. in a complex software project. All related files must either be part of a Git repository or
+of a variable, subroutine, function, etc. and to all its references. All related files must either be part of a Git repository or
 inside the current working directory.
 
-This plugin calls [fxtran](https://github.com/pmarguinaud/fxtran) and [Fypp](https://github.com/aradi/fypp) under the hood.
+This plugin calls [fortls](https://github.com/fortran-lang/fortls) under the hood.
 
 ## Installation
 
@@ -21,17 +21,13 @@ call plug#end()
 
 3. Re-open Vim and run `:PlugInstall`.
 
-4. Install further Python packages with `pip install GitPython lxml`.
+4. Install further Python packages with `pip install GitPython fortls`.
 
 ## Usage
 
 Open any Fortran file and move the cursor onto an entity name (for example, a variable).
-By default, the plugin is bound to the key `F4`. Press it to navigate to the matching declaration.
+Press `F3` to navigate to its declaration. Press `F4` to see all references.
 
 ## Update
 
 To fetch the latest version of this plugin, run `:PlugUpdate`.
-
-## Tests
-
-Tests have been implemented for this plugin. Go to the `test` directory and run `./run_tests.py`.
