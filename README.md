@@ -1,5 +1,3 @@
-[![pipeline status](https://github.com/terminationshock/fortran-vim-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/terminationshock/fortran-vim-plugin/actions/workflows/test.yml)
-
 # Fortran Vim Plugin
 
 This repository provides a Vim plugin for Fortran developers. In its current version, it can be used to jump to the declaration
