@@ -18,7 +18,7 @@ def send_request(path, method, filename, row, col):
     request += build_request("textDocument/" + method, {"textDocument": {"uri": filename}, "position": {"line": row, "character": col}})
 
     pid = subprocess.Popen(
-        "fortls",
+        ["fortls", "--incremental_sync", "--disable_autoupdate"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -70,7 +70,8 @@ def evaluate_response(filename, responses):
         vim.command(":set efm=%f:%l:%c")
         vim.command(":cexpr [{}]".format(",".join(["'{}'".format(item) for item in items])))
         vim.command(":copen")
-        vim.command(":call setqflist([], 'a', {'title' : ''})")
+        vim.command(":call setqflist([], 'a', {'title' : 'References'})")
+        vim.command(":cfirst")
 
 
 def run(method):
