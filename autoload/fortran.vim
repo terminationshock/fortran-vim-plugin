@@ -13,12 +13,12 @@ def build_request(method, params):
     return "Content-Length: {}\r\nContent-Type: application/vscode-jsonrpc; charset=utf8\r\n\r\n{}".format(content_length, body)
 
 
-def send_request(path, method, filename, row, col):
+def send_request(path, exclude, method, filename, row, col):
     request = build_request("initialize", {"rootPath": path})
     request += build_request("textDocument/" + method, {"textDocument": {"uri": filename}, "position": {"line": row, "character": col}})
 
     pid = subprocess.Popen(
-        ["fortls", "--incremental_sync", "--disable_autoupdate"],
+        ["fortls", "--incremental_sync", "--disable_autoupdate", "--excl_paths"] + exclude,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -86,11 +86,20 @@ def run(method):
     try:
         repo = git.Repo('.', search_parent_directories=True)
         path = repo.working_dir
+
+        exclude = []
+        for folder in os.listdir(os.getcwd()):
+            if os.path.isdir(folder):
+                abspath = os.path.join(path, folder)
+                try:
+                    repo.git.ls_files(abspath, error_unmatch=True)
+                except git.GitCommandError:
+                    exclude.append(abspath)
     except git.InvalidGitRepositoryError:
         path = os.getcwd()
 
     try:
-        response = send_request(path, method, filename, row, col)
+        response = send_request(path, exclude, method, filename, row, col)
         if response is not None:
             vim.command(":echon ''")
             evaluate_response(filename, response)
