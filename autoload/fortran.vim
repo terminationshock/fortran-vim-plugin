@@ -83,11 +83,11 @@ def run(method):
     row = int(vim.eval("line('.')")) - 1
     col = int(vim.eval("col('.')")) - 1
 
+    exclude = []
     try:
         repo = git.Repo('.', search_parent_directories=True)
         path = repo.working_dir
 
-        exclude = []
         for folder in os.listdir(os.getcwd()):
             if os.path.isdir(folder):
                 abspath = os.path.join(path, folder)
