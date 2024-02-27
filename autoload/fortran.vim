@@ -94,7 +94,7 @@ def run(method):
                 try:
                     repo.git.ls_files(abspath, error_unmatch=True)
                 except git.GitCommandError:
-                    exclude.append(abspath)
+                    exclude.append(os.path.join(abspath, "**"))
     except git.InvalidGitRepositoryError:
         path = os.getcwd()
 
