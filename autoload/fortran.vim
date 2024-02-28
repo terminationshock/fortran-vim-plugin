@@ -57,7 +57,7 @@ def extract_position(response):
     return filename, row, col
 
 
-def evaluate_response(filename, responses):
+def evaluate_response(filename, cword, responses):
     if len(responses) == 1:
         new_filename, row, col = extract_position(responses[0])
         if new_filename != filename:
@@ -72,12 +72,13 @@ def evaluate_response(filename, responses):
         vim.command(":set efm=%f:%l:%c")
         vim.command(":cexpr [{}]".format(",".join(["'{}'".format(item) for item in items])))
         vim.command(":copen")
-        vim.command(":call setqflist([], 'a', {'title' : 'References'})")
+        vim.command(":call setqflist([], 'a', {'title' : 'References to " + cword + "'})")
         vim.command(":cfirst")
 
 
 def run(method):
-    vim.command(":echon 'Please wait...'")
+    cword = vim.eval("cword")
+    vim.command(":echon 'Searching for {}...'".format(cword))
     vim.command(":redraw")
     filename = vim.eval("l:filename")
     row = int(vim.eval("line('.')")) - 1
@@ -102,7 +103,7 @@ def run(method):
         response = send_request(path, exclude, method, filename, row, col)
         if response is not None:
             vim.command(":echon ''")
-            evaluate_response(filename, response)
+            evaluate_response(filename, cword, response)
         else:
             vim.command(":echon 'No result'")
     except Exception as e:
@@ -111,10 +112,12 @@ EOF
 
 function! fortran#FindDefinition()
     let l:filename = resolve(expand('%:p'))
+    let l:cword = expand('<cword>')
     python3 run("definition")
 endfunction
 
 function! fortran#FindReferences()
     let l:filename = resolve(expand('%:p'))
+    let l:cword = expand('<cword>')
     python3 run("references")
 endfunction
