@@ -1,10 +1,10 @@
 python3 << EOF
 import vim
 import git
+import io
 import json
 import os
 import subprocess
-from io import StringIO
 
 
 def build_request(method, params):
@@ -29,7 +29,7 @@ def send_request(path, exclude, method, filename, row, col):
         raise Exception("Empty response from fortls")
 
     lastline = None
-    for line in StringIO(response[0].decode()):
+    for line in io.StringIO(response[0].decode()):
         if line.startswith("{"):
             lastline = line
 
