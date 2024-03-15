@@ -5,6 +5,7 @@ import io
 import json
 import os
 import subprocess
+import urllib.parse
 
 
 def build_request(method, params):
@@ -51,6 +52,7 @@ def extract_position(response):
     filename = response["uri"]
     if filename.startswith("file://"):
         filename = filename[7:]
+    filename = urllib.parse.unquote(filename)
 
     row = response["range"]["start"]["line"] + 1
     col = response["range"]["start"]["character"] + 1
