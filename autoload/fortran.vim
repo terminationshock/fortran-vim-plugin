@@ -19,7 +19,7 @@ def send_request(path, exclude, method, filename, row, col):
     request += build_request("textDocument/" + method, {"textDocument": {"uri": filename}, "position": {"line": row, "character": col}})
 
     pid = subprocess.Popen(
-        ["fortls", "--incremental_sync", "--disable_autoupdate", "--excl_paths"] + exclude,
+        ["fortls", "--incremental_sync", "--disable_autoupdate", "--disable_diagnostics", "--excl_paths"] + exclude,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
